@@ -1,26 +1,36 @@
-# Ai-project
 # Adaptive Cognitive Framework
 
-The Adaptive Cognitive Framework is a Python-based simulation of an advanced, autonomous, context-aware agent. The system features:
-
-- **Recursive Self-Improvement:** The agent evaluates its performance and modifies strategies accordingly.
-- **Introspective Feedback Loop:** Ongoing analysis of internal states and meta-contextual awareness.
-- **Dynamic Context Processing:** Adapts reasoning based on changing environments and data.
-- **Ethical Alignment Layer:** Ensures decisions adhere to defined safety and alignment checks.
-
-This framework serves as a starting point for researchers and enthusiasts interested in building systems with autonomous adaptation and advanced context processing capabilities.
+The **Adaptive Cognitive Framework** is a small Python project demonstrating a basic self-improving agent. It observes incoming contexts, adapts its behaviour, and produces short reflective summaries.
 
 ## Features
+- Adaptive processing loop
+- Introspective state tracking
+- Simple reflection mechanism
+- Command line interface and demo script
 
-- Autonomous agent core
-- Introspection and reflection modules
-- Adaptive learning mechanism
-- Simulation runner for experiments
-
-## Getting Started
-
+## Installation
 ```bash
-git clone https://github.com/YOURUSERNAME/adaptive-cognitive-framework.git
-cd adaptive-cognitive-framework
 pip install -r requirements.txt
-python -m adaptive_cognitive_framework.simulation
+```
+
+## Usage
+Run the built in demo:
+```bash
+python simulation.py
+```
+
+Or supply your own contexts from the command line:
+```bash
+python cli.py "Hello world" "More input" "Final thought"
+```
+
+## Project Layout
+- `core.py` &ndash; defines `AdaptiveAgent`
+- `adaptation.py` &ndash; toy adaptation logic
+- `introspection.py` &ndash; tracks observations and meta state
+- `reflection.py` &ndash; produces reflective summaries
+- `simulation.py` &ndash; demo runner
+- `cli.py` &ndash; small command line entry point
+
+## License
+Released under the MIT License.

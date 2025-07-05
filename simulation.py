@@ -1,4 +1,5 @@
-from .core import AdaptiveAgent
+# Allow running as a standalone script without package context
+from core import AdaptiveAgent
 
 def main():
     agent = AdaptiveAgent()
