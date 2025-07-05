@@ -1,6 +1,7 @@
-from .introspection import IntrospectiveState
-from .adaptation import AdaptiveLoop
-from .reflection import ReflectiveProcessor
+# Use absolute imports so the module can run as a script or as part of a package
+from introspection import IntrospectiveState
+from adaptation import AdaptiveLoop
+from reflection import ReflectiveProcessor
 
 class AdaptiveAgent:
     def __init__(self):
