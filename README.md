@@ -16,8 +16,9 @@ practical documentation. The framework now:
 - Produces structured adaptation results with type-specific insights.
 - Generates reflective summaries that surface recent behaviour and emotional
   valence trends.
-- Includes a CLI-friendly simulation runner and automated tests to validate the
-  basic contract of the agent.
+- Includes a CLI-friendly simulation runner with an **interactive mode** and
+  **persistence capabilities** (save/load state).
+- Includes automated tests to validate the basic contract of the agent.
 
 ## Project layout
 
@@ -47,15 +48,25 @@ source .venv/bin/activate  # On Windows use `.venv\\Scripts\\activate`
 pip install -r requirements.txt
 ```
 
-### 3. Run the demo simulation
+### 3. Run the simulation
 
+#### Demo Mode
+Run the standard demo:
 ```bash
 python -m simulation
 ```
 
-The script prints each step processed by the agent, including the adaptation
-summary, the transformed context, and the introspection report for that moment
-in time.
+#### Interactive Mode
+Run the agent interactively:
+```bash
+python -m simulation --interactive
+```
+
+In interactive mode, you can:
+- Type JSON or text input to process it.
+- Use `/save <filename>` to save the agent's state to a file.
+- Use `/load <filename>` to load the agent's state from a file.
+- Use `/quit` or `/exit` to stop.
 
 ### 4. Execute the tests
 

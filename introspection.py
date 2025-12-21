@@ -88,6 +88,37 @@ class IntrospectiveState:
             summaries.append(f"{descriptor} (size={size})")
         return summaries
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize the current state to a dictionary."""
+        return {
+            "history": self.history,
+            "recent_contexts": list(self.recent_contexts),
+            "meta_context": self.meta_context,
+            "emotional_valence": self.emotional_valence,
+            "valence_trace": list(self.valence_trace),
+            "context_stats": self.context_stats,
+            "adaptation_log": list(self.adaptation_log),
+        }
+
+    def load_from_dict(self, data: Dict[str, Any]) -> None:
+        """Restore the state from a dictionary."""
+        self.history = data.get("history", [])
+        self.recent_contexts = deque(
+            data.get("recent_contexts", []), maxlen=self.HISTORY_WINDOW
+        )
+        self.meta_context = data.get("meta_context", {})
+        self.emotional_valence = data.get("emotional_valence", 0.0)
+        self.valence_trace = deque(
+            data.get("valence_trace", []), maxlen=self.HISTORY_WINDOW
+        )
+        self.context_stats = data.get(
+            "context_stats",
+            {"text": 0, "sequence": 0, "mapping": 0, "numeric": 0, "other": 0},
+        )
+        self.adaptation_log = deque(
+            data.get("adaptation_log", []), maxlen=self.HISTORY_WINDOW
+        )
+
     def _describe_context(self, context: Any) -> str:
         if isinstance(context, str):
             return "text"
