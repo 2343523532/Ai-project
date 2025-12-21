@@ -23,3 +23,16 @@ class AdaptiveAgent:
             "reflection": reflection,
             "meta_state": self.state.report()
         }
+
+    def save_state(self, filepath: str) -> None:
+        """Save the agent's internal state to a file."""
+        import json
+        with open(filepath, 'w') as f:
+            json.dump(self.state.to_dict(), f, default=str, indent=2)
+
+    def load_state(self, filepath: str) -> None:
+        """Load the agent's internal state from a file."""
+        import json
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+            self.state.load_from_dict(data)
