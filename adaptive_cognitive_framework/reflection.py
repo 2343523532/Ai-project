@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Any
 
-if __package__:
-    from .adaptation import AdaptationResult
-else:
-    from adaptation import AdaptationResult
+from .adaptation import AdaptationResult
 
 
 class ReflectiveProcessor:
-    def __init__(self, state):
+    def __init__(self, state: Any) -> None:
         self.state = state
 
     def reflect(self, adaptation: Optional[AdaptationResult]) -> str:
@@ -19,8 +16,8 @@ class ReflectiveProcessor:
             return "No context to reflect on."
 
         summaries = ", ".join(self.state.summarize_recent_contexts())
-        valence = self.state.emotional_valence
-        trend = self.state.report()["valence_trend"]
+        valence = float(self.state.emotional_valence)
+        trend = float(self.state.report()["valence_trend"])
         adaptation_summary = adaptation.summary if adaptation else "No new adaptation"
         return (
             "Reflection: "

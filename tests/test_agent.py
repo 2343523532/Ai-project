@@ -1,44 +1,5 @@
-import importlib.util
+from adaptive_cognitive_framework.core import AdaptiveAgent
 import json
-import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-PACKAGE_NAME = "adaptive_cognitive_framework"
-
-
-def _load_package() -> None:
-    if PACKAGE_NAME in sys.modules:
-        return
-
-    package_spec = importlib.util.spec_from_file_location(
-        f"{PACKAGE_NAME}.__init__",
-        ROOT / "__init__.py",
-        submodule_search_locations=[str(ROOT)],
-    )
-    if not package_spec or not package_spec.loader:
-        raise RuntimeError("Unable to prepare package spec for adaptive framework")
-
-    package = importlib.util.module_from_spec(package_spec)
-    sys.modules[PACKAGE_NAME] = package
-    package_spec.loader.exec_module(package)
-
-
-def _load_module(module: str):
-    _load_package()
-    spec = importlib.util.spec_from_file_location(
-        f"{PACKAGE_NAME}.{module}",
-        ROOT / f"{module}.py",
-    )
-    if not spec or not spec.loader:
-        raise RuntimeError(f"Unable to load module {module}")
-    module_obj = importlib.util.module_from_spec(spec)
-    sys.modules[f"{PACKAGE_NAME}.{module}"] = module_obj
-    spec.loader.exec_module(module_obj)
-    return module_obj
-
-
-AdaptiveAgent = _load_module("core").AdaptiveAgent
 
 
 def test_agent_process_structure():
