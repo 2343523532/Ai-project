@@ -24,13 +24,15 @@ practical documentation. The framework now:
 
 ```
 .
-├── adaptation.py      # Adaptive loop producing structured results
-├── core.py            # High-level `AdaptiveAgent` orchestrating modules
-├── introspection.py   # Introspective state tracking history and metrics
-├── reflection.py      # Reflective processor producing narrative summaries
-├── simulation.py      # Demo runner for the adaptive agent
-├── tests/             # Lightweight pytest-based test suite
-└── requirements.txt   # Python dependencies
+├── adaptive_cognitive_framework/  # Source package
+│   ├── adaptation.py              # Adaptive loop producing structured results
+│   ├── core.py                    # High-level `AdaptiveAgent` orchestrating modules
+│   ├── introspection.py           # Introspective state tracking history and metrics
+│   ├── reflection.py              # Reflective processor producing narrative summaries
+│   └── simulation.py              # Demo runner for the adaptive agent
+├── tests/                         # Lightweight pytest-based test suite
+├── pyproject.toml                 # Package configuration
+└── requirements.txt               # Python dependencies
 ```
 
 ## Getting started
@@ -42,10 +44,11 @@ python -m venv .venv
 source .venv/bin/activate  # On Windows use `.venv\\Scripts\\activate`
 ```
 
-### 2. Install dependencies
+### 2. Install dependencies and the package
 
 ```bash
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ### 3. Run the simulation
@@ -53,13 +56,13 @@ pip install -r requirements.txt
 #### Demo Mode
 Run the standard demo:
 ```bash
-python -m simulation
+python -m adaptive_cognitive_framework.simulation
 ```
 
 #### Interactive Mode
 Run the agent interactively:
 ```bash
-python -m simulation --interactive
+python -m adaptive_cognitive_framework.simulation --interactive
 ```
 
 In interactive mode, you can:

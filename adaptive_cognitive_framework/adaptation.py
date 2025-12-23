@@ -50,7 +50,11 @@ class AdaptiveLoop:
         if isinstance(context, (list, tuple, set, np.ndarray)):
             sequence = list(context)
             reversed_sequence = list(reversed(sequence))
-            mean_value = float(np.mean(sequence)) if self._is_numeric_sequence(sequence) else None
+            mean_value = (
+                float(np.mean(sequence))
+                if self._is_numeric_sequence(sequence)
+                else None
+            )
             summary = "Processed sequence context"
             details = {
                 "transformation": "reverse",

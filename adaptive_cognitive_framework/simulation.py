@@ -4,15 +4,9 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
 from typing import Iterable
 
-if __package__:
-    from .core import AdaptiveAgent
-else:
-    ROOT = Path(__file__).resolve().parent
-    sys.path.append(str(ROOT))
-    from core import AdaptiveAgent
+from .core import AdaptiveAgent
 
 
 def run_demo(inputs: Iterable[object]) -> None:
@@ -33,7 +27,9 @@ def run_demo(inputs: Iterable[object]) -> None:
 
 def run_interactive() -> None:
     agent = AdaptiveAgent()
-    print("Interactive Mode. Type input or commands (/save <file>, /load <file>, /quit)")
+    print(
+        "Interactive Mode. Type input or commands (/save <file>, /load <file>, /quit)"
+    )
 
     while True:
         try:
@@ -91,6 +87,7 @@ def main() -> None:
         7,
     ]
     run_demo(demo_inputs)
+
 
 if __name__ == "__main__":
     main()
