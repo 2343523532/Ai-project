@@ -68,6 +68,22 @@ In interactive mode, you can:
 - Use `/load <filename>` to load the agent's state from a file.
 - Use `/quit` or `/exit` to stop.
 
+#### Custom Input File
+You can provide your own contexts from a file:
+```bash
+python -m simulation --input-file my_contexts.json
+```
+
+Supported file formats:
+- A JSON array (e.g., `["text", {"a": 1}, [1, 2]]`)
+- Newline-delimited values (each line can be JSON or plain text)
+
+#### Save Final State in Demo Mode
+Persist state automatically after demo mode runs:
+```bash
+python -m simulation --save-state agent_state.json
+```
+
 ### 4. Execute the tests
 
 ```bash
