@@ -104,3 +104,22 @@ pytest
 
 This project is released under the MIT License. See [`LICENSE`](LICENSE) for
 more information.
+
+
+## Cyber-OS v5.0 (Common Lisp scenario)
+
+This repository now also includes `cyber-os-v5.lisp`, a standalone Common Lisp
+"active trace" cyberpunk simulation featuring:
+
+- Hunchentoot-powered REST API (`/api/search`, `/api/fuzzy`)
+- Single-page matrix UI (AJAX `fetch` + terminal-style output + CRT scanlines)
+- Secure banking loop with Black ICE lockout at 100% trace
+- Root shell commands including `scan`, `net-up`, `bank`, `status`, and `audit`
+
+Quick start:
+
+```bash
+sbcl
+* (load "cyber-os-v5.lisp")
+* (cyber-os:boot)
+```
