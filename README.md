@@ -104,3 +104,27 @@ pytest
 
 This project is released under the MIT License. See [`LICENSE`](LICENSE) for
 more information.
+
+## Cyber-OS v5.0 (Lisp Edition)
+
+This repository now also includes `cyber-os-v5.lisp`, a standalone Common Lisp
+experience that provides:
+
+- An active trace + Black ICE lockout mechanic for the secure banking flow.
+- A local scanner command (`scan`) in the root OS shell.
+- A Hunchentoot-powered SPA-style web matrix at `http://localhost:8080` with
+  async `/api/search` and `/api/fuzzy` calls.
+
+### Run Cyber-OS v5.0
+
+```bash
+sbcl
+* (load "cyber-os-v5.lisp")
+* (cyber-os:boot)
+```
+
+Once booted:
+- Use `scan` to discover node IDs.
+- Use `net-up` to start the web matrix.
+- Use `bank` to attempt authenticated withdrawal with semantic passphrase checks.
+- Use `status` and `audit` to monitor trace and security logs.
