@@ -123,3 +123,16 @@ sbcl
 * (load "cyber-os-v5.lisp")
 * (cyber-os:boot)
 ```
+
+
+## Quantum Super AI simulator (Common Lisp)
+
+This repository also includes `quantum_ai.lisp`, a standalone Common Lisp
+simulation that runs cognition + financial routing cycles with corrected Common
+Lisp `(random ...)` calls and a Luhn-valid card generator.
+
+Quick start:
+
+```bash
+sbcl --script quantum_ai.lisp
+```
