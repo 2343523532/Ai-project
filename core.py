@@ -24,6 +24,20 @@ class AdaptiveAgent:
             "meta_state": self.state.report()
         }
 
+    def process_batch(self, contexts):
+        """Process a sequence of contexts and return all results."""
+        return [self.process(ctx) for ctx in contexts]
+
+    def reset_state(self) -> None:
+        """Reset the agent to a fresh introspective state."""
+        self.state = IntrospectiveState()
+        self.adaptive_loop = AdaptiveLoop(self.state)
+        self.reflective_processor = ReflectiveProcessor(self.state)
+
+    def get_state_snapshot(self) -> dict:
+        """Return a serializable snapshot of the current internal state."""
+        return self.state.to_dict()
+
     def save_state(self, filepath: str) -> None:
         """Save the agent's internal state to a file."""
         import json

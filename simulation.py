@@ -36,6 +36,24 @@ def run_demo(inputs: Iterable[object], *, save_state: str | None = None) -> None
         print(f"State saved to {save_state}")
 
 
+def summarize_results(results: List[dict]) -> dict:
+    """Build a compact summary from a list of process results."""
+
+    if not results:
+        return {
+            "total_steps": 0,
+            "last_adaptation_summary": None,
+            "final_history_length": 0,
+        }
+
+    last = results[-1]
+    return {
+        "total_steps": len(results),
+        "last_adaptation_summary": last.get("adaptation_summary"),
+        "final_history_length": last.get("meta_state", {}).get("history_length", 0),
+    }
+
+
 def parse_context(raw_value: str) -> object:
     """Parse a single context value from JSON with string fallback."""
 
