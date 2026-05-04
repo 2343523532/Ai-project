@@ -73,3 +73,19 @@ def test_agent_handles_various_inputs():
         assert result["adaptation_summary"].startswith("Processed")
         assert "valence" in result["reflection"].lower()
         assert result["meta_state"]["history_length"] >= 1
+
+
+def test_agent_batch_snapshot_and_reset():
+    agent = AdaptiveAgent()
+    results = agent.process_batch(["one", {"x": 1}, [1, 2]])
+
+    assert len(results) == 3
+    assert results[-1]["meta_state"]["history_length"] == 3
+
+    snapshot = agent.get_state_snapshot()
+    assert "history" in snapshot
+    assert len(snapshot["history"]) == 3
+
+    agent.reset_state()
+    post_reset = agent.state.report()
+    assert post_reset["history_length"] == 0

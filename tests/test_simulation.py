@@ -2,7 +2,7 @@ import json
 import os
 import tempfile
 
-from simulation import load_inputs_from_file, parse_context
+from simulation import load_inputs_from_file, parse_context, summarize_results
 
 
 def test_parse_context_json_and_text():
@@ -34,3 +34,28 @@ def test_load_inputs_from_newline_file():
         assert result == [{"x": 1}, "plain", [1, 2]]
     finally:
         os.remove(tmp_path)
+
+
+def test_summarize_results_handles_empty_and_populated_inputs():
+    empty_summary = summarize_results([])
+    assert empty_summary["total_steps"] == 0
+    assert empty_summary["last_adaptation_summary"] is None
+
+    populated_summary = summarize_results(
+        [
+            {
+                "adaptation_summary": "Processed text",
+                "meta_state": {"history_length": 1},
+            },
+            {
+                "adaptation_summary": "Processed list",
+                "meta_state": {"history_length": 2},
+            },
+        ]
+    )
+
+    assert populated_summary == {
+        "total_steps": 2,
+        "last_adaptation_summary": "Processed list",
+        "final_history_length": 2,
+    }
