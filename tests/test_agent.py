@@ -48,13 +48,18 @@ def test_agent_process_structure():
     assert set(result.keys()) == {
         "processed_context",
         "adaptation_summary",
+        "adaptation",
         "reflection",
         "meta_state",
+        "recommendations",
     }
 
     assert isinstance(result["processed_context"], dict)
     assert result["adaptation_summary"]
+    assert result["adaptation"]["confidence"] > 0
+    assert result["recommendations"]
     assert "valence" in result["reflection"].lower()
+    assert "confidence" in result["reflection"].lower()
 
     meta_state = result["meta_state"]
     assert meta_state["history_length"] == 1
@@ -89,3 +94,37 @@ def test_agent_batch_snapshot_and_reset():
     agent.reset_state()
     post_reset = agent.state.report()
     assert post_reset["history_length"] == 0
+
+
+def test_enriched_adaptation_metrics_for_core_types():
+    agent = AdaptiveAgent()
+
+    text_result = agent.process("make this better and stable")
+    assert text_result["processed_context"]["lexical_diversity"] > 0
+    assert text_result["processed_context"]["sentiment_hint"] >= 2
+
+    sequence_result = agent.process([1, 1, 2, 3])
+    assert sequence_result["processed_context"]["mean"] == 1.75
+    assert "entropy" in sequence_result["processed_context"]
+
+    mapping_result = agent.process({"signal": 42, "status": ""})
+    assert mapping_result["processed_context"]["value_types"] == {
+        "signal": "int",
+        "status": "str",
+    }
+    assert mapping_result["processed_context"]["missing_like_keys"] == ["status"]
+
+    numeric_result = agent.process(-2)
+    assert numeric_result["processed_context"]["sign"] == "negative"
+    assert 0 < numeric_result["processed_context"]["normalized"] < 1
+
+
+def test_meta_state_tracks_novelty_and_dominant_type():
+    agent = AdaptiveAgent()
+    agent.process("first")
+    result = agent.process("second")
+
+    meta_state = result["meta_state"]
+    assert meta_state["dominant_context_type"] == "text"
+    assert meta_state["recent_context_novelty"] == 0.0
+    assert meta_state["observation_log"][-1]["descriptor"] == "text"

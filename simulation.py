@@ -24,6 +24,9 @@ def run_demo(inputs: Iterable[object], *, save_state: str | None = None) -> None
         print(f"Step {index}")
         print("Input:", ctx)
         print("Adaptation Summary:", result["adaptation_summary"])
+        print("Adaptation Confidence:", result.get("adaptation", {}).get("confidence"))
+        print("Recommendations:")
+        print(json.dumps(result.get("recommendations", []), indent=2, default=str))
         print("Processed Context:")
         print(json.dumps(result["processed_context"], indent=2, default=str))
         print("Reflection:", result["reflection"])
@@ -44,13 +47,24 @@ def summarize_results(results: List[dict]) -> dict:
             "total_steps": 0,
             "last_adaptation_summary": None,
             "final_history_length": 0,
+            "average_confidence": 0.0,
         }
 
     last = results[-1]
+    confidence_values = [
+        item.get("adaptation", {}).get("confidence", 0.0)
+        for item in results
+        if item.get("adaptation")
+    ]
+    average_confidence = (
+        sum(confidence_values) / len(confidence_values) if confidence_values else 0.0
+    )
+
     return {
         "total_steps": len(results),
         "last_adaptation_summary": last.get("adaptation_summary"),
         "final_history_length": last.get("meta_state", {}).get("history_length", 0),
+        "average_confidence": round(average_confidence, 4),
     }
 
 
@@ -123,6 +137,9 @@ def run_interactive() -> None:
 
             result = agent.process(ctx)
             print("Adaptation Summary:", result["adaptation_summary"])
+            print("Adaptation Confidence:", result.get("adaptation", {}).get("confidence"))
+            print("Recommendations:")
+            print(json.dumps(result.get("recommendations", []), indent=2, default=str))
             print("Processed Context:")
             print(json.dumps(result["processed_context"], indent=2, default=str))
             print("Reflection:", result["reflection"])

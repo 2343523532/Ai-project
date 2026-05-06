@@ -84,6 +84,24 @@ Persist state automatically after demo mode runs:
 python -m simulation --save-state agent_state.json
 ```
 
+
+### New adaptive diagnostics
+
+Every processing cycle now returns an enriched adaptation payload in addition to
+the original summary fields. The payload includes:
+
+- `confidence`: a best-effort score for how strongly the agent understood the
+  input shape.
+- `recommendations`: practical next actions derived from the context type.
+- Type-specific diagnostics such as lexical diversity for text, entropy and
+  distribution metrics for sequences, schema hints for mappings, and normalized
+  scale comparisons for numbers.
+- Rolling introspection metadata including novelty scores, dominant context type,
+  and an observation log.
+
+This keeps the project useful as an adaptive simulation without asserting real
+AI sentience or hidden autonomous capabilities.
+
 ### 4. Execute the tests
 
 ```bash
