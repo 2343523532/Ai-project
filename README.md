@@ -11,11 +11,12 @@ The original version offered a minimal skeleton. This revision expands the
 simulation to provide richer metrics, structured adaptation results, and more
 practical documentation. The framework now:
 
-- Tracks detailed meta-context information (recent context types, sizes, and
-  adaptation history).
-- Produces structured adaptation results with type-specific insights.
-- Generates reflective summaries that surface recent behaviour and emotional
-  valence trends.
+- Tracks detailed meta-context information (recent context types, sizes,
+  transition counts, novelty score, cognitive load, and adaptation history).
+- Produces structured adaptation results with type-specific insights, selected
+  strategy names, confidence scores, and signal tags for downstream tooling.
+- Generates reflective summaries that surface recent behaviour, emotional
+  valence trends, strategy confidence, novelty, and a recommended next focus.
 - Includes a CLI-friendly simulation runner with an **interactive mode** and
   **persistence capabilities** (save/load state).
 - Includes automated tests to validate the basic contract of the agent.
@@ -90,10 +91,35 @@ python -m simulation --save-state agent_state.json
 pytest
 ```
 
+
+## Structured result example
+
+`AdaptiveAgent.process(...)` now returns both backward-compatible summary fields
+and a richer `adaptation` object:
+
+```python
+{
+    "adaptation_summary": "Processed textual context with lexical profiling",
+    "adaptation": {
+        "strategy": "text-lexical-profiler",
+        "confidence": 0.85,
+        "signals": ["textual_signal", "high_lexical_diversity"],
+        "details": {"token_count": 7, "lexical_diversity": 1.0},
+    },
+    "meta_state": {
+        "dominant_context_type": "text",
+        "novelty_score": 0.0,
+        "cognitive_load": 0.48,
+    },
+}
+```
+
 ## Extending the framework
 
-- Add new adaptation strategies by extending `AdaptiveLoop._adapt_context` and
-  logging human-readable summaries via `IntrospectiveState.record_adaptation`.
+- Add new adaptation strategies by extending `AdaptiveLoop._adapt_context` or one
+  of its type-specific helpers (`_adapt_text`, `_adapt_sequence`,
+  `_adapt_mapping`, `_adapt_numeric`) and logging human-readable summaries via
+  `IntrospectiveState.record_adaptation`.
 - Experiment with alternative reflection styles by modifying
   `ReflectiveProcessor.reflect`.
 - Integrate external data sources by feeding structured inputs to

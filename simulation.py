@@ -47,10 +47,15 @@ def summarize_results(results: List[dict]) -> dict:
         }
 
     last = results[-1]
+    meta_state = last.get("meta_state", {})
+    adaptation = last.get("adaptation") or {}
     return {
         "total_steps": len(results),
         "last_adaptation_summary": last.get("adaptation_summary"),
-        "final_history_length": last.get("meta_state", {}).get("history_length", 0),
+        "final_history_length": meta_state.get("history_length", 0),
+        "dominant_context_type": meta_state.get("dominant_context_type"),
+        "cognitive_load": meta_state.get("cognitive_load"),
+        "last_strategy": adaptation.get("strategy"),
     }
 
 
@@ -85,12 +90,16 @@ def load_inputs_from_file(filepath: str) -> List[object]:
     if isinstance(parsed, list):
         return parsed
 
-    raise ValueError("Input file must contain a JSON array or newline-delimited entries.")
+    raise ValueError(
+        "Input file must contain a JSON array or newline-delimited entries."
+    )
 
 
 def run_interactive() -> None:
     agent = AdaptiveAgent()
-    print("Interactive Mode. Type input or commands (/save <file>, /load <file>, /quit)")
+    print(
+        "Interactive Mode. Type input or commands (/save <file>, /load <file>, /quit)"
+    )
 
     while True:
         try:
@@ -132,8 +141,12 @@ def run_interactive() -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run the adaptive cognitive framework demo.")
-    parser.add_argument("--interactive", action="store_true", help="Run in interactive mode")
+    parser = argparse.ArgumentParser(
+        description="Run the adaptive cognitive framework demo."
+    )
+    parser.add_argument(
+        "--interactive", action="store_true", help="Run in interactive mode"
+    )
     parser.add_argument(
         "--input-file",
         help="Path to a file containing demo contexts (JSON array or newline-delimited entries)",
@@ -157,10 +170,10 @@ def main(argv: list[str] | None = None) -> None:
         demo_inputs = load_inputs_from_file(args.input_file)
     else:
         demo_inputs = [
-            "First context",
+            "First context with enough words for lexical analysis",
             [1, 2, 3, 4],
-            "Another experience to analyze",
-            {"signal": 42, "status": "stable"},
+            "Another experience to analyze, compare, and refine",
+            {"signal": 42, "status": "stable", "tags": ["demo", "safe"]},
             7,
         ]
     run_demo(demo_inputs, save_state=args.save_state)

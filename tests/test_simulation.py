@@ -25,8 +25,8 @@ def test_load_inputs_from_json_array_file():
 def test_load_inputs_from_newline_file():
     with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".txt") as tmp:
         tmp.write('{"x": 1}\n')
-        tmp.write('plain\n')
-        tmp.write('[1,2]\n')
+        tmp.write("plain\n")
+        tmp.write("[1,2]\n")
         tmp_path = tmp.name
 
     try:
@@ -58,4 +58,7 @@ def test_summarize_results_handles_empty_and_populated_inputs():
         "total_steps": 2,
         "last_adaptation_summary": "Processed list",
         "final_history_length": 2,
+        "dominant_context_type": None,
+        "cognitive_load": None,
+        "last_strategy": None,
     }
