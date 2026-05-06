@@ -40,16 +40,19 @@ def test_summarize_results_handles_empty_and_populated_inputs():
     empty_summary = summarize_results([])
     assert empty_summary["total_steps"] == 0
     assert empty_summary["last_adaptation_summary"] is None
+    assert empty_summary["average_confidence"] == 0.0
 
     populated_summary = summarize_results(
         [
             {
                 "adaptation_summary": "Processed text",
                 "meta_state": {"history_length": 1},
+                "adaptation": {"confidence": 0.4},
             },
             {
                 "adaptation_summary": "Processed list",
                 "meta_state": {"history_length": 2},
+                "adaptation": {"confidence": 0.8},
             },
         ]
     )
@@ -58,4 +61,5 @@ def test_summarize_results_handles_empty_and_populated_inputs():
         "total_steps": 2,
         "last_adaptation_summary": "Processed list",
         "final_history_length": 2,
+        "average_confidence": 0.6,
     }

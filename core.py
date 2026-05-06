@@ -8,20 +8,27 @@ else:
     from reflection import ReflectiveProcessor
 
 class AdaptiveAgent:
+    """High-level orchestrator for observation, adaptation, and reflection."""
+
     def __init__(self):
         self.state = IntrospectiveState()
         self.adaptive_loop = AdaptiveLoop(self.state)
         self.reflective_processor = ReflectiveProcessor(self.state)
 
     def process(self, input_context):
+        """Process one context and return a structured cognitive cycle report."""
+
         self.state.observe(input_context)
         adaptation = self.adaptive_loop.run()
         reflection = self.reflective_processor.reflect(adaptation)
+        adaptation_payload = adaptation.to_dict() if adaptation else None
         return {
             "processed_context": adaptation.details if adaptation else None,
             "adaptation_summary": adaptation.summary if adaptation else None,
+            "adaptation": adaptation_payload,
             "reflection": reflection,
-            "meta_state": self.state.report()
+            "meta_state": self.state.report(),
+            "recommendations": adaptation.recommendations if adaptation else [],
         }
 
     def process_batch(self, contexts):

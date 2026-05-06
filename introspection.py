@@ -3,23 +3,23 @@
 from __future__ import annotations
 
 from collections import deque
+from copy import deepcopy
 from statistics import mean
 from typing import Any, Deque, Dict, List
 
 
 class IntrospectiveState:
-    """Tracks the internal history and meta-context for the agent.
-
-    The original project stored only the latest context and a simple valence
-    value.  To make the agent more informative we now maintain:
-
-    - A rolling memory of recent contexts for lightweight analysis.
-    - Type statistics for quick introspective reporting.
-    - A history of valence updates so we can provide trend information.
-    - A registry of the most recent adaptations for later reflection.
-    """
+    """Tracks history, metrics, and rolling diagnostics for the agent."""
 
     HISTORY_WINDOW = 5
+    DEFAULT_CONTEXT_STATS = {
+        "text": 0,
+        "sequence": 0,
+        "mapping": 0,
+        "numeric": 0,
+        "boolean": 0,
+        "other": 0,
+    }
 
     def __init__(self) -> None:
         self.history: List[Any] = []
@@ -27,28 +27,35 @@ class IntrospectiveState:
         self.meta_context: Dict[str, Any] = {}
         self.emotional_valence: float = 0.0
         self.valence_trace: Deque[float] = deque(maxlen=self.HISTORY_WINDOW)
-        self.context_stats: Dict[str, int] = {
-            "text": 0,
-            "sequence": 0,
-            "mapping": 0,
-            "numeric": 0,
-            "other": 0,
-        }
+        self.context_stats: Dict[str, int] = dict(self.DEFAULT_CONTEXT_STATS)
         self.adaptation_log: Deque[str] = deque(maxlen=self.HISTORY_WINDOW)
+        self.observation_log: Deque[Dict[str, Any]] = deque(maxlen=self.HISTORY_WINDOW)
 
     def observe(self, context: Any) -> None:
         """Store the incoming context and update summary information."""
 
+        descriptor = self._describe_context(context)
+        size = self._estimate_size(context)
+        novelty = self.novelty_score(context)
+
         self.history.append(context)
         self.recent_contexts.append(context)
-        descriptor = self._describe_context(context)
-        self.context_stats[descriptor] += 1
+        self.context_stats[descriptor] = self.context_stats.get(descriptor, 0) + 1
+        observation = {
+            "index": len(self.history),
+            "descriptor": descriptor,
+            "size": size,
+            "novelty_score": novelty,
+        }
+        self.observation_log.append(observation)
 
         self.meta_context.update(
             {
                 "last": context,
                 "last_descriptor": descriptor,
-                "last_size": self._estimate_size(context),
+                "last_size": size,
+                "last_novelty_score": novelty,
+                "last_observation": observation,
             }
         )
 
@@ -72,10 +79,13 @@ class IntrospectiveState:
             "recent_context": self.meta_context.get("last"),
             "recent_context_descriptor": self.meta_context.get("last_descriptor"),
             "recent_context_size": self.meta_context.get("last_size"),
+            "recent_context_novelty": round(self.meta_context.get("last_novelty_score", 0.0), 4),
             "emotional_valence": round(self.emotional_valence, 4),
             "valence_trend": round(rolling_average, 4),
             "context_stats": dict(self.context_stats),
+            "dominant_context_type": self.dominant_context_type(),
             "recent_adaptations": list(self.adaptation_log),
+            "observation_log": list(self.observation_log),
         }
 
     def summarize_recent_contexts(self) -> List[str]:
@@ -88,20 +98,43 @@ class IntrospectiveState:
             summaries.append(f"{descriptor} (size={size})")
         return summaries
 
+    def novelty_score(self, context: Any) -> float:
+        """Estimate whether the context differs from the current rolling window."""
+
+        if not self.recent_contexts:
+            return 1.0
+        descriptor = self._describe_context(context)
+        descriptor_matches = sum(
+            1 for recent in self.recent_contexts if self._describe_context(recent) == descriptor
+        )
+        repetition_penalty = descriptor_matches / len(self.recent_contexts)
+        return round(max(0.0, 1.0 - repetition_penalty), 4)
+
+    def dominant_context_type(self) -> str | None:
+        """Return the most frequently observed context descriptor."""
+
+        non_zero = {key: value for key, value in self.context_stats.items() if value > 0}
+        if not non_zero:
+            return None
+        return max(non_zero, key=non_zero.get)
+
     def to_dict(self) -> Dict[str, Any]:
         """Serialize the current state to a dictionary."""
+
         return {
-            "history": self.history,
+            "history": deepcopy(self.history),
             "recent_contexts": list(self.recent_contexts),
-            "meta_context": self.meta_context,
+            "meta_context": deepcopy(self.meta_context),
             "emotional_valence": self.emotional_valence,
             "valence_trace": list(self.valence_trace),
-            "context_stats": self.context_stats,
+            "context_stats": dict(self.context_stats),
             "adaptation_log": list(self.adaptation_log),
+            "observation_log": list(self.observation_log),
         }
 
     def load_from_dict(self, data: Dict[str, Any]) -> None:
         """Restore the state from a dictionary."""
+
         self.history = data.get("history", [])
         self.recent_contexts = deque(
             data.get("recent_contexts", []), maxlen=self.HISTORY_WINDOW
@@ -111,17 +144,20 @@ class IntrospectiveState:
         self.valence_trace = deque(
             data.get("valence_trace", []), maxlen=self.HISTORY_WINDOW
         )
-        self.context_stats = data.get(
-            "context_stats",
-            {"text": 0, "sequence": 0, "mapping": 0, "numeric": 0, "other": 0},
-        )
+        self.context_stats = dict(self.DEFAULT_CONTEXT_STATS)
+        self.context_stats.update(data.get("context_stats", {}))
         self.adaptation_log = deque(
             data.get("adaptation_log", []), maxlen=self.HISTORY_WINDOW
+        )
+        self.observation_log = deque(
+            data.get("observation_log", []), maxlen=self.HISTORY_WINDOW
         )
 
     def _describe_context(self, context: Any) -> str:
         if isinstance(context, str):
             return "text"
+        if isinstance(context, bool):
+            return "boolean"
         if isinstance(context, (list, tuple, set)):
             return "sequence"
         if isinstance(context, dict):
